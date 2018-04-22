@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Ondrejd\'s Tickets
+ * Plugin Name: ondrejd's Tickets
  * Plugin URI: https://github.com/ondrejd/odwp-tickets
  * Description: Plugin that provides simple ticket system that I'm using with some of my clients. 
  * Version: 0.1.0
@@ -18,7 +18,7 @@
  * @link https://github.com/ondrejd/odwp-tickets for the canonical source repository
  * @license https://www.gnu.org/licenses/gpl-3.0.en.html GNU General Public License 3.0
  * @package odwp-tickets
- * @since 0.0.1
+ * @since 0.1.0
  */
 
 /**
@@ -42,7 +42,7 @@ if( ! defined( 'ABSPATH' ) ) {
 }
 
 // Some constants
-defined( 'TICKETS_SLUG' ) || define( 'TICKETS_SLUG', 'odwpt' );
+defined( 'TICKETS_SLUG' ) || define( 'TICKETS_SLUG', 'odwptickets' );
 defined( 'TICKETS_NAME' ) || define( 'TICKETS_NAME', 'odwp-tickets' );
 defined( 'TICKETS_PATH' ) || define( 'TICKETS_PATH', dirname( __FILE__ ) . '/' );
 defined( 'TICKETS_FILE' ) || define( 'TICKETS_FILE', __FILE__ );
@@ -51,16 +51,19 @@ defined( 'TICKETS_FILE' ) || define( 'TICKETS_FILE', __FILE__ );
 if( ! function_exists( 'odwpt_check_requirements' ) ) :
     /**
      * Checks requirements of our plugin.
+     * 
      * @global string $wp_version
      * @param array $requirements
      * @return array
-     * @since 1.0.0
+     * @since 0.1.0
+     * @uses get_option()
+     * @uses load_plugin_textdomain()
      */
     function odwpt_check_requirements( array $requirements ) {
         global $wp_version;
 
         // Initialize locales
-        load_plugin_textdomain( TICKETS_NAME, false, TICKETS_NAME . '/languages' );
+        load_plugin_textdomain( TICKETS_SLUG, false, TICKETS_NAME . '/languages' );
 
         /**
          * @var array Hold requirement errors
@@ -102,6 +105,7 @@ if( ! function_exists( 'odwpt_check_requirements' ) ) :
         // Check WP plugins
         if( count( $requirements['wp']['plugins'] ) > 0 ) {
             $active_plugins = (array) get_option( 'active_plugins', [] );
+
             foreach( $requirements['wp']['plugins'] as $req_plugin ) {
                 if( ! in_array( $req_plugin, $active_plugins ) ) {
                     $errors[] = sprintf(
@@ -120,17 +124,21 @@ endif;
 if( ! function_exists( 'odwpt_deactivate_raw' ) ) :
     /**
      * Deactivate plugin by the raw way (it updates directly WP options).
+     * 
      * @return void
-     * @since 1.0.0
+     * @since 0.1.00.1.0
+     * @uses update_option()
      */
     function odwpt_deactivate_raw() {
         $active_plugins = get_option( 'active_plugins' );
         $out = [];
+
         foreach( $active_plugins as $key => $val ) {
             if( $val != TICKETS_NAME . '/' . TICKETS_NAME . '.php' ) {
                 $out[$key] = $val;
             }
         }
+
         update_option( 'active_plugins', $out );
     }
 endif;
@@ -138,12 +146,12 @@ endif;
 
 if( ! function_exists( 'readonly' ) ) :
     /**
-     * Prints HTML readonly attribute. It's an addition to WP original
-     * functions {@see disabled()} and {@see checked()}.
+     * <p>Prints HTML readonly attribute. It's an addition to WP original functions {@see disabled()} and {@see checked()}.</p>
+     * 
      * @param mixed $value
      * @param mixed $current (Optional.) Defaultly TRUE.
      * @return string
-     * @since 1.0.0
+     * @since 0.1.0
      */
     function readonly( $current, $value = true ) {
         if( $current == $value ) {
@@ -160,7 +168,6 @@ endif;
 $odwpt_errs = odwpt_check_requirements( [
     'php' => [
         // Enter minimum PHP version you needs
-        // TODO But we uses lambda functions in screen classes!!!
         'version' => '5.6',
         // Enter extensions that your plugin needs
         'extensions' => [
